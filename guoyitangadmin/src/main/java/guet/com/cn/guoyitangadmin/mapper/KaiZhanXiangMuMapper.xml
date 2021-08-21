@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="guet.com.cn.guoyitangadmin.mapper.KaiZhanXiangMuMapper">
+    <select id="AllData" resultType="guet.com.cn.guoyitangadmin.bean.KaiZhanXiangMu">
+        SELECT NAME,CONTENT,PRICE,DATA_TYPE FROM tb_natmeha_project
+    </select>
+
+    <select id="SelectData" resultType="guet.com.cn.guoyitangadmin.bean.KaiZhanXiangMu">
+        SELECT NAME,CONTENT,PRICE,DATA_TYPE FROM tb_natmeha_project WHERE NAME LIKE CONCAT('%',#{0},'%')
+    </select>
+
+    <select id="SelectDataType" resultType="guet.com.cn.guoyitangadmin.bean.KaiZhanXiangMu">
+        SELECT NAME,CONTENT,PRICE,DATA_TYPE FROM tb_natmeha_project WHERE DATA_TYPE=#{0}
+    </select>
+
+    <insert id="AddInformation">
+        insert into tb_natmeha_project (itemCode, NAME, CONTENT,USER_CODE,DATA_TYPE)
+        values(#{2},#{0},#{1},'cac9df54-7bd5-484c-8e11-3a9c366c80ea','1')
+    </insert>
+
+
+
+    <insert id="AddInformationFeature">
+        insert into tb_natmeha_project (NAME,PRICE, CONTENT,itemCode, USER_CODE,DATA_TYPE)
+        values(#{0},#{1},#{2},#{3},'cac9df54-7bd5-484c-8e11-3a9c366c80ea','1')
+    </insert>
+
+</mapper>

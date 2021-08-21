@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="guet.com.cn.guoyitangadmin.mapper.MedicateddietMapper">
+    <select id="viewMedicateddiet" resultType="guet.com.cn.guoyitangadmin.bean.Medicateddiet" >
+        select * from medicateddiet
+    </select>
+    <resultMap id="medicateddiet" type="guet.com.cn.guoyitangadmin.bean.Medicateddiet">
+        <id property="tittle" column="tittle"></id>
+        <result property="origin" column="origin"></result>
+        <result property="author" column="author"></result>
+        <result property="publicTime" column="publicTime"></result>
+
+    </resultMap>
+    <select id="searchMedicateddiet" resultMap="medicateddiet" parameterType="map" >
+       select * from medicateddiet
+
+            <where>
+                <if test="searchInput !=null and searchInput!=''">
+                    AND author LIKE concat('%',#{searchInput},'%')
+                    OR tittle LIKE concat('%',#{searchInput},'%')
+                    OR origin LIKE concat('%',#{searchInput},'%')
+                </if>
+                <if test="selectState !=null and selectState!=''">
+                    AND status=#{selectState}
+                </if>
+
+                <if test="timePickerStart !=null and timePickerStart!='' and timePickerEnd !=null and timePickerEnd!=''">
+                    AND TIME(publicTime) BETWEEN #{timePickerStart} AND #{timePickerEnd}
+                </if>
+
+            </where>
+
+    </select>
+
+    <select id="selectById" resultMap="medicateddiet" parameterType="string">
+        select * FROM  medicateddiet where id=#{value}
+    </select>
+    <insert id="addMedicateddiet" parameterType="map">
+        INSERT INTO medicateddiet values (#{id},#{tittle},#{origin},#{author},str_to_date(#{publictime,},'%Y-%m-%d %H:%i:%s' ),#{status})
+
+    </insert>
+
+    <update id="modifyMedicateddiet" parameterType="map">
+        UPDATE medicateddiet set  tittle= #{tittle}, origin=#{origin},author=#{author},publicTime=str_to_date(#{publictime,},'%Y-%m-%d %H:%i:%s' ) where id=#{id}
+    </update>
+
+    <delete id="deleteMedicateddiet" parameterType="string">
+        delete from medicateddiet where id=#{id}
+
+    </delete>
+
+</mapper>

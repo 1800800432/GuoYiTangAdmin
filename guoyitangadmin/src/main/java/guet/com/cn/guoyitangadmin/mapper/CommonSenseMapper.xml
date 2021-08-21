@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org/DTD Mapper 3.0" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="guet.com.cn.guoyitangadmin.mapper.CommonSenseMapper">
+
+    <select id="viewCommonSenseIndex" resultType="guet.com.cn.guoyitangadmin.bean.Tb_natmeha_chinese_medicine">
+        select * from tb_natmeha_chinese_medicine
+    </select>
+
+    <select id="searchCommonSense" resultType="guet.com.cn.guoyitangadmin.bean.Tb_natmeha_chinese_medicine" parameterType="map">
+        select * from tb_natmeha_chinese_medicine
+        <where>
+            <if test="searchInput !=null and searchInput!=''">
+                AND name LIKE concat('%',#{searchInput},'%')
+                OR alias LIKE concat('%',#{searchInput},'%')
+            </if>
+            <if test="displayState !=null and displayState!=''">
+                AND status=#{displayState}
+            </if>
+
+            <if test="EfState !=null and EfState!='' ">
+                AND CLASSIFICATION=#{EfState}
+            </if>
+        </where>
+
+
+    </select>
+</mapper>

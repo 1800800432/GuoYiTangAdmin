@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="guet.com.cn.guoyitangadmin.mapper.UserPersionInformationMapper">
+
+    <resultMap id="mapOfPersionInformation" type="guet.com.cn.guoyitangadmin.bean.UserPersionInformation">
+        <id property="user_id" column="user_id"></id>
+        <result property="type1" column="type1"></result>
+        <result property="type2" column="type2"></result>
+        <result property="characteristic" column="lb_cjbx"></result>
+        <result property="method1" column="tl_qztj"></result>
+        <result property="method2" column="tl_tyfs_ys"></result>
+        <result property="method3" column="tl_tyfs_qj"></result>
+        <result property="method4" column="tl_tyfs_yd"></result>
+        <result property="method5" column="tl_tyfs_xwbj"></result>
+    </resultMap>
+    <select id="selectPersion" resultMap="mapOfPersionInformation">
+        SELECT T13.*,T14.TYPE2 AS TYPE2 FROM
+        (SELECT T11.user_id,T11.tcm_remark,T12.type_name AS TYPE1,lb_cjbx,tl_qztj,tl_tyfs_ys,tl_tyfs_qj,tl_tyfs_yd,tl_tyfs_xwbj FROM
+        (SELECT T2.user_id,T2.tcm_remark,T3.type_id AS TYPE1 FROM
+        (SELECT user_id,tcm_remark,MAX(SCORE) as score FROM
+        (SELECT a.user_id,a.tcm_remark,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q  WHERE a.type_id=q.type_id  AND a.user_id=#{0} GROUP BY a.tcm_remark,a.type_id) AS T1
+        GROUP BY tcm_remark) AS T2,
+        (SELECT a.user_id,a.tcm_remark,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q  WHERE a.type_id=q.type_id  AND a.user_id=#{0} GROUP BY a.tcm_remark,a.type_id) AS T3
+        WHERE T2.tcm_remark=T3.tcm_remark AND T2.SCORE=T3.SCORE) AS T11,
+        t_knowledge_tcm_type AS T12
+        WHERE T11.TYPE1=T12.type_id) AS T13,
+        (SELECT   T9.user_id,T9.tcm_remark,T10.type_name AS TYPE2 FROM
+        (SELECT T7.user_id,T7.tcm_remark,MIN(type_id) AS TYPE2 FROM
+        (SELECT   user_id,tcm_remark,MIN(score) as score FROM
+        (SELECT t4.* FROM
+        (SELECT a.user_id,a.tcm_remark,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q  WHERE a.type_id=q.type_id  AND a.user_id=#{0}  GROUP BY a.tcm_remark,a.type_id ORDER BY tcm_remark,score DESC ) AS T4
+        WHERE (SELECT COUNT(*)
+        FROM
+        (SELECT a.user_id,a.tcm_remark,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q  WHERE a.type_id=q.type_id  AND a.user_id=#{0}  GROUP BY a.tcm_remark,a.type_id ORDER BY tcm_remark,score DESC ) AS T5
+        WHERE T5.tcm_remark=T4.tcm_remark AND T5.SCORE>T4.SCORE
+        ) &lt;2
+        ORDER BY T4.tcm_remark,SCORE DESC) AS T6
+        GROUP BY tcm_remark) AS T7 ,
+        (SELECT t4.* FROM
+        (SELECT a.user_id,a.tcm_remark,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q  WHERE a.type_id=q.type_id  AND a.user_id=#{0}  GROUP BY a.tcm_remark,a.type_id ORDER BY tcm_remark,score DESC ) AS T4
+        WHERE (SELECT COUNT(*)
+        FROM
+        (SELECT a.user_id,a.tcm_remark,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q  WHERE a.type_id=q.type_id  AND a.user_id=#{0}  GROUP BY a.tcm_remark,a.type_id ORDER BY tcm_remark,score DESC ) AS T5
+        WHERE T5.tcm_remark=T4.tcm_remark AND T5.SCORE>T4.SCORE
+        )&lt;2
+        ORDER BY T4.tcm_remark,SCORE DESC) AS T8
+        WHERE T7.tcm_remark=T8.tcm_remark AND T7.SCORE=T8.SCORE
+        GROUP BY tcm_remark) AS T9,
+        t_knowledge_tcm_type AS T10
+        WHERE T9.type2=T10.type_id) AS T14
+        WHERE T13.user_id=T14.user_id  AND T13.tcm_remark=T14.tcm_remark
+    </select>
+
+
+    <select id="testTime" resultType="String">
+        SELECT T.tcm_remark FROM t_user_answer AS T WHERE T.user_id=#{0}
+    </select>
+
+
+    <select id="isBody" resultType="String">
+        SELECT t.type_name FROM t_knowledge_tcm_type AS t
+        WHERE t.type_id=
+        (SELECT  V.type_id
+        FROM
+        (SELECT a.type_id,SUM(a.q_option) AS score FROM t_user_answer AS a   WHERE a.user_id=#{0} GROUP BY a.type_id ORDER BY score DESC) AS V
+        WHERE V.score=(SELECT  MAX(V.score)
+        FROM
+        (SELECT a.type_id,SUM(a.q_option) AS score FROM t_user_answer AS a   WHERE a.user_id=#{0} GROUP BY a.type_id ORDER BY score DESC) AS V)
+        )
+    </select>
+
+
+    <select id="turnToBody" resultType="String">
+        (SELECT type_name AS type2 FROM
+        (SELECT a.user_id,a.type_id,SUM(q_option) AS score FROM t_user_answer AS a,t_knowledge_tcm_question AS q WHERE a.type_id=q.type_id AND a.user_id=#{0} GROUP BY a.type_id ) AS M ,t_knowledge_tcm_type AS T
+        WHERE M.type_id=T.type_id ORDER BY score DESC limit 1,1)
+    </select>
+</mapper>
